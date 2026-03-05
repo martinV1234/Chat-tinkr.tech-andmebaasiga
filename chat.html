@@ -3,12 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Chat</title>
-<style>
-  body { font-family: sans-serif; max-width: 600px; margin: 20px auto; }
-  #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
-  input { padding: 5px; margin: 5px 0; }
-  button { padding: 5px 10px; }
-</style>
 </head>
 <body>
 
@@ -61,13 +55,11 @@ async function sendMessage() {
 }
 
 sendBtn.addEventListener("click", sendMessage);
-messageInput.addEventListener("keypress", e => {
-  if (e.key === "Enter") sendMessage();
-});
 
 setInterval(loadMessages, 2000);
 loadMessages();
 </script>
 
 </body>
+
 </html>
