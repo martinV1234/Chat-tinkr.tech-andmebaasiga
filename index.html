@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  img {
+    height: 200px;
+    width: 200px;
+  }
+</style>
+<title>Chat</title>
+</head>
+<body>
+
+<h2>Chat</h2>
+
+<div id="chat"></div>
+
+<input id="name" placeholder="Your name">
+<input id="message" placeholder="Your message">
+<button id="sendBtn">Send</button>
+<button id="deleteBtn">Delete</button>
+
+<script>
+const DB_URL = "https://tinkr.tech/sdb/Chat5";
+const chatBox = document.getElementById("chat");
+const nameInput = document.getElementById("name");
+const messageInput = document.getElementById("message");
+const sendBtn = document.getElementById("sendBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+
+function isHttpLink(str) {
+  try {
+    const url = new URL(str);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+async function loadMessages() {
+  try {
+    const response = await fetch(DB_URL);
+    const messages = await response.json();
+    chatBox.innerHTML = "";
+    messages.forEach(msg => {
+      const p = document.createElement("p");
+      if (isHttpLink(msg.texts)) {
+        try {
+          const img = document.createElement("img");
+          img.src = msg.texts
+          chatBox.appendChild(img);
+        } catch (err) {
+          //console.log(err);
+        }
+      }
+      p.innerHTML = `<b>${msg.username}:</b> ${msg.texts}`;
+      chatBox.appendChild(p);
+    });
+    chatBox.scrollTop = chatBox.scrollHeight;
+  } catch (err) {
+    //console.error(err);
+  }
+}
+
+async function sendMessage() {
+  const username = nameInput.value.trim();
+  const texts = messageInput.value.trim();
+  if (!username || !texts) return;
+  try {
+    await fetch(DB_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ texts, username })
+    });
+    messageInput.value = "";
+    loadMessages();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function deleteOLD() {
+  const response = await fetch('https://tinkr.tech/sdb/Chat5');
+  const saved = await response.json();
+  let count3 = 0
+  for (const item of saved) {
+    const iden = item.id
+    count3 = count3 + 1
+    await fetch(`https://tinkr.tech/sdb/Chat5/${iden}`, { method: 'DELETE' }); 
+  } 
+}
+
+
+
+sendBtn.addEventListener("click", sendMessage);
+deleteBtn.addEventListener("click", deleteOLD);
+setInterval(loadMessages, 1000);
+loadMessages();
+</script>
+
+</body>
+
+</html>
